@@ -28,10 +28,10 @@ impl ArcballCamera {
     /// `[screen_width, screen_height]`
     pub fn new(look_at: &Matrix4<f32>, motion_speed: f32, zoom_speed: f32, screen: [f32; 2]) -> ArcballCamera {
         ArcballCamera {
-            look_at: look_at.clone(),
+            look_at: *look_at,
             translation: Transform::one(),
             rotation: Quaternion::new(1.0, 0.0, 0.0, 0.0),
-            camera: look_at.clone(),
+            camera: *look_at,
             inv_camera: look_at.invert().unwrap(),
             motion_speed: motion_speed,
             zoom_speed: zoom_speed,
