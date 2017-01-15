@@ -25,7 +25,7 @@ pub struct ArcballCamera {
 impl ArcballCamera {
     /// Create a new Arcball camera starting from the look at matrix `look_at`. The `motion_speed`
     /// sets the speed for panning and `zoom_speed` the speed for zooming the camera. `screen` should be
-    /// `[screen_width, screen_height]`
+    /// `[screen_width, screen_height]`.
     pub fn new(look_at: &Matrix4<f32>, motion_speed: f32, zoom_speed: f32, screen: [f32; 2]) -> ArcballCamera {
         ArcballCamera {
             look_at: *look_at,
@@ -44,8 +44,8 @@ impl ArcballCamera {
     }
     /// Rotate the camera, mouse positions should be in pixel coordinates.
     ///
-    /// Rotates starting from the orientation at the previous mouse position, `mouse_prev`,
-    /// and rotating to desired orientation at the current mouse position, `mouse_cur`.
+    /// Rotates from the orientation at the previous mouse position specified by `mouse_prev`
+    /// to the orientation at the current mouse position, `mouse_cur`.
     pub fn rotate(&mut self, mouse_prev: Vector2<f32>, mouse_cur: Vector2<f32>) {
         let m_cur = Vector2::new(clamp(mouse_cur.x * 2.0 * self.inv_screen[0] - 1.0, -1.0, 1.0),
                                     clamp(1.0 - 2.0 * mouse_cur.y * self.inv_screen[1], -1.0, 1.0));
@@ -57,21 +57,21 @@ impl ArcballCamera {
         self.camera = self.translation * self.look_at * Matrix4::from(self.rotation);
         self.inv_camera = self.camera.invert().unwrap();
     }
-    /// Zoom the camera in by some amount, positive values zoom in, negative zoom out.
+    /// Zoom the camera in by some amount. Positive values zoom in, negative zoom out.
     pub fn zoom(&mut self, amount: f32, elapsed: f32) {
         let motion = Vector3::new(0.0, 0.0, amount);
         self.translation = Matrix4::from_translation(motion * self.zoom_speed * elapsed) * self.translation;
         self.camera = self.translation * self.look_at * Matrix4::from(self.rotation);
         self.inv_camera = self.camera.invert().unwrap();
     }
-    /// Pan the camera following the delta motion of the mouse. Mouse delta should be in pixels.
+    /// Pan the camera following the motion of the mouse. The mouse delta should be in pixels.
     pub fn pan(&mut self, mouse_delta: Vector2<f32>, elapsed: f32) {
         let motion = Vector3::new(mouse_delta.x, mouse_delta.y, 0.0) * self.motion_speed * elapsed;
         self.translation = Matrix4::from_translation(motion) * self.translation;
         self.camera = self.translation * self.look_at * Matrix4::from(self.rotation);
         self.inv_camera = self.camera.invert().unwrap();
     }
-    /// Update the screen dimensions if the window has resized.
+    /// Update the screen dimensions, e.g. if the window has resized.
     pub fn update_screen(&mut self, width: f32, height: f32) {
         self.inv_screen[0] = 1.0 / width;
         self.inv_screen[1] = 1.0 / height;
