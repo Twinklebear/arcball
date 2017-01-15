@@ -10,9 +10,9 @@ exclude = [
 	".gitignore",
 ]
 description = "An implementation of the Shoemake Arcball camera"
-documentation = ""
-homepage = ""
-repository = ""
+documentation = "http://www.willusher.io/arcball/arcball/"
+homepage = "https://github.com/Twinklebear/arcball"
+repository = "https://github.com/Twinklebear/arcball"
 
 [dependencies]
 cgmath = "0.12.0"

@@ -1,7 +1,7 @@
 #![cfg_attr(feature = "unstable", feature(plugin))]
 #![cfg_attr(feature = "unstable", plugin(clippy))]
 
-//! An implementation of the [Shoemake Arcball Camera](http://dl.acm.org/citation.cfm?id=155312)
+//! An implementation of the [Shoemake Arcball Camera](https://www.talisman.org/~erlkonig/misc/shoemake92-arcball.pdf)
 //! using [cgmath](https://crates.io/crates/cgmath). See the
 //! [cube example](https://github.com/Twinklebear/arcball/blob/master/examples/cube.rs) for an example
 //! of use with [glium](https://crates.io/crates/glium).
