@@ -1,0 +1,27 @@
+sudo: false
+language: rust
+rust:
+  - nightly
+  - beta
+  - stable
+
+# load travis-cargo
+before_script:
+  - pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
+
+# the main build
+script:
+  - travis-cargo build
+  - travis-cargo test
+  - travis-cargo --only stable doc
+
+#after_success:
+# upload the documentation from the build with stable (automatically only actually
+# runs on the master branch, not individual PRs)
+#- travis-cargo --only stable doc-upload
+
+#env:
+#  global:
+    # encrypted github token for doc upload (see `GH_TOKEN` link above)
+    #- secure: "..."
+
