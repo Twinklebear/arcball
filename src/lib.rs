@@ -1,5 +1,6 @@
 //! An implementation of the [Shoemake Arcball Camera](http://dl.acm.org/citation.cfm?id=155312)
-//! using [cgmath](https://crates.io/crates/cgmath). See the [cube example]() for an example
+//! using [cgmath](https://crates.io/crates/cgmath). See the
+//! [cube example](https://github.com/Twinklebear/arcball/blob/master/examples/cube.rs) for an example
 //! of use with [glium](https://crates.io/crates/glium).
 extern crate cgmath;
 
