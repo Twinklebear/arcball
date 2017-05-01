@@ -79,7 +79,8 @@ fn main() {
     ).unwrap();
 
     let display_dims = display.get_framebuffer_dimensions();
-    let mut persp_proj = cgmath::perspective(cgmath::Deg(65.0), display_dims.0 as f32 / display_dims.1 as f32, 1.0, 200.0);
+    let mut persp_proj = cgmath::perspective(cgmath::Deg(65.0), display_dims.0 as f32 / display_dims.1 as f32,
+                                             1.0, 200.0);
     let mut arcball_camera = {
         let look_at = Matrix4::<f32>::look_at(Point3::new(0.0, 0.0, 6.0),
                                               Point3::new(0.0, 0.0, 0.0),
@@ -107,7 +108,8 @@ fn main() {
                 Event::MouseMoved(x, y) => {
                     let prev = prev_mouse.unwrap();
                     if mouse_pressed[0] {
-                        arcball_camera.rotate(Vector2::new(prev.0 as f32, prev.1 as f32), Vector2::new(x as f32, y as f32));
+                        arcball_camera.rotate(Vector2::new(prev.0 as f32, prev.1 as f32),
+                                              Vector2::new(x as f32, y as f32));
                     } else if mouse_pressed[1] {
                         let mouse_delta = Vector2::new((x - prev.0) as f32, -(y - prev.1) as f32);
                         arcball_camera.pan(mouse_delta, 0.16);
