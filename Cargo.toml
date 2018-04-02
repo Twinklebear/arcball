@@ -1,6 +1,6 @@
 [package]
 name = "arcball"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Will Usher <willusher.life@gmail.com>"]
 readme = "README.md"
 keywords = ["camera", "arcball", "shoemake"]
@@ -15,7 +15,7 @@ homepage = "https://github.com/Twinklebear/arcball"
 repository = "https://github.com/Twinklebear/arcball"
 
 [dependencies]
-cgmath = "0.15.0"
+cgmath = "0.16.1"
 clippy = { version = "0.0.148", optional = true }
 
 [dev-dependencies]
