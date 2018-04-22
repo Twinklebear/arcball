@@ -5,7 +5,8 @@ extern crate cgmath;
 
 use glium::Surface;
 use glium::index::PrimitiveType;
-use glium::glutin::{self, ElementState, Event, VirtualKeyCode, MouseButton, MouseScrollDelta};
+use glium::glutin::{self, ControlFlow, ElementState, Event, MouseButton, MouseScrollDelta,
+                    VirtualKeyCode, WindowEvent};
 use cgmath::{Point3, Vector3, Vector2, Matrix4};
 use arcball::ArcballCamera;
 
@@ -17,12 +18,16 @@ struct Vertex {
 implement_vertex!(Vertex, pos, color);
 
 fn main() {
-    use glium::DisplayBuild;
 
-    let display = glutin::WindowBuilder::new()
-        .with_title("Arcball Camera Cube Example")
-        .build_glium()
-        .unwrap();
+    let window = glutin::WindowBuilder::new()
+        .with_title("Arcball Camera Cube Example");
+    let context = glutin::ContextBuilder::new()
+        .with_vsync(true)
+        .with_depth_buffer(24);
+    let mut events_loop = glutin::EventsLoop::new();
+
+    let display =
+        glium::Display::new(window, context, &events_loop).expect("failed to create display");
 
     // Hard-coded cube triangle strip
     let vertex_buffer = glium::VertexBuffer::new(&display,
@@ -90,53 +95,70 @@ fn main() {
 
     // Track if left/right mouse is down
     let mut mouse_pressed = [false, false];
-    let mut prev_mouse = None;
-    'outer: loop {
-        for e in display.poll_events() {
-            match e {
-                glutin::Event::Closed => break 'outer,
-                Event::KeyboardInput(state, _, code) => {
-                    let pressed = state == ElementState::Pressed;
+    let mut prev_mouse: Option<(f64, f64)> = None;
+
+    events_loop.run_forever(|e| {
+        match e {
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::Closed => return ControlFlow::Break,
+                WindowEvent::KeyboardInput { input, .. } => {
+                    let code = input.virtual_keycode;
+                    let pressed = input.state == ElementState::Pressed;
                     match code {
-                        Some(VirtualKeyCode::Escape) if pressed => break 'outer,
+                        Some(VirtualKeyCode::Escape) if pressed => return ControlFlow::Break,
                         _ => {}
                     }
-                },
-                Event::MouseMoved(x, y) if prev_mouse.is_none() => {
-                    prev_mouse = Some((x, y));
-                },
-                Event::MouseMoved(x, y) => {
-                    let prev = prev_mouse.unwrap();
-                    if mouse_pressed[0] {
-                        arcball_camera.rotate(Vector2::new(prev.0 as f32, prev.1 as f32),
-                                              Vector2::new(x as f32, y as f32));
-                    } else if mouse_pressed[1] {
-                        let mouse_delta = Vector2::new((x - prev.0) as f32, -(y - prev.1) as f32);
-                        arcball_camera.pan(mouse_delta, 0.16);
+                }
+
+                WindowEvent::CursorMoved { position, .. } => {
+                    let x = position.0;
+                    let y = position.1;
+
+                    if prev_mouse.is_none() {
+                        prev_mouse = Some((x, y));
+                    } else {
+                        let prev = prev_mouse.unwrap();
+                        if mouse_pressed[0] {
+                            arcball_camera.rotate(
+                                Vector2::new(prev.0 as f32, prev.1 as f32),
+                                Vector2::new(x as f32, y as f32),
+                            );
+                        } else if mouse_pressed[1] {
+                            let mouse_delta =
+                                Vector2::new((x - prev.0) as f32, -(y - prev.1) as f32);
+                            arcball_camera.pan(mouse_delta, 0.16);
+                        }
+                        prev_mouse = Some((x, y));
                     }
-                    prev_mouse = Some((x, y));
-                },
-                Event::MouseInput(state, button) => {
+                }
+                WindowEvent::MouseInput { state, button, .. } => {
                     if button == MouseButton::Left {
                         mouse_pressed[0] = state == ElementState::Pressed;
                     } else if button == MouseButton::Right {
                         mouse_pressed[1] = state == ElementState::Pressed;
                     }
-                },
-                Event::MouseWheel(delta, _) => {
+                }
+                WindowEvent::MouseWheel { delta, .. } => {
                     let y = match delta {
                         MouseScrollDelta::LineDelta(_, y) => y,
                         MouseScrollDelta::PixelDelta(_, y) => y,
                     };
                     arcball_camera.zoom(y, 0.16);
-                },
-                Event::Resized(w, h) => {
-                    persp_proj = cgmath::perspective(cgmath::Deg(65.0), w as f32 / h as f32, 1.0, 1000.0);
+                }
+                WindowEvent::Resized(w, h) => {
+                    persp_proj =
+                        cgmath::perspective(cgmath::Deg(65.0), w as f32 / h as f32, 1.0, 1000.0);
                     arcball_camera.update_screen(w as f32, h as f32);
-                },
-                _ => {}
+                }
+                _ => {
+                    return ControlFlow::Continue;
+                }
+            },
+            _ => {
+                return ControlFlow::Continue;
             }
         }
+
         let proj_view: [[f32; 4]; 4] = (persp_proj * arcball_camera.get_mat4()).into();
         let uniforms = uniform! {
             proj_view: proj_view,
@@ -145,9 +167,9 @@ fn main() {
             depth: glium::Depth {
                 test: glium::draw_parameters::DepthTest::IfLess,
                 write: true,
-                .. Default::default()
+                ..Default::default()
             },
-            .. Default::default()
+            ..Default::default()
         };
 
         let mut target = display.draw();
@@ -155,6 +177,9 @@ fn main() {
         target.clear_depth(1.0);
         target.draw(&vertex_buffer, &index_buffer, &program, &uniforms, &draw_params).unwrap();
         target.finish().unwrap();
-    }
+
+        return ControlFlow::Continue;
+    });
 }
+
 
