@@ -19,7 +19,7 @@ cgmath = "0.16.1"
 clippy = { version = "0.0.148", optional = true }
 
 [dev-dependencies]
-glium = "0.16.0"
+glium = "0.21.0"
 
 [features]
 unstable = ["clippy"]
