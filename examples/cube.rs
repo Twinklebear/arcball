@@ -95,12 +95,12 @@ fn main() {
 
     // Track if left/right mouse is down
     let mut mouse_pressed = [false, false];
-    let mut prev_mouse: Option<(f64, f64)> = None;
+    let mut prev_mouse: Option<(f32, f32)> = None;
 
     events_loop.run_forever(|e| {
         match e {
             Event::WindowEvent { event, .. } => match event {
-                WindowEvent::Closed => return ControlFlow::Break,
+                WindowEvent::CloseRequested => return ControlFlow::Break,
                 WindowEvent::KeyboardInput { input, .. } => {
                     let code = input.virtual_keycode;
                     let pressed = input.state == ElementState::Pressed;
@@ -111,8 +111,8 @@ fn main() {
                 }
 
                 WindowEvent::CursorMoved { position, .. } => {
-                    let x = position.0;
-                    let y = position.1;
+                    let x = position.x as f32;
+                    let y = position.y as f32;
 
                     if prev_mouse.is_none() {
                         prev_mouse = Some((x, y));
@@ -120,12 +120,12 @@ fn main() {
                         let prev = prev_mouse.unwrap();
                         if mouse_pressed[0] {
                             arcball_camera.rotate(
-                                Vector2::new(prev.0 as f32, prev.1 as f32),
-                                Vector2::new(x as f32, y as f32),
+                                Vector2::new(prev.0, prev.1),
+                                Vector2::new(x, y),
                             );
                         } else if mouse_pressed[1] {
                             let mouse_delta =
-                                Vector2::new((x - prev.0) as f32, -(y - prev.1) as f32);
+                                Vector2::new((x - prev.0), -(y - prev.1));
                             arcball_camera.pan(mouse_delta, 0.16);
                         }
                         prev_mouse = Some((x, y));
@@ -141,14 +141,16 @@ fn main() {
                 WindowEvent::MouseWheel { delta, .. } => {
                     let y = match delta {
                         MouseScrollDelta::LineDelta(_, y) => y,
-                        MouseScrollDelta::PixelDelta(_, y) => y,
+                        MouseScrollDelta::PixelDelta(p) => p.y as f32,
                     };
                     arcball_camera.zoom(y, 0.16);
                 }
-                WindowEvent::Resized(w, h) => {
+                WindowEvent::Resized(size) => {
+                    let w = size.width as f32;
+                    let h = size.height as f32;
                     persp_proj =
-                        cgmath::perspective(cgmath::Deg(65.0), w as f32 / h as f32, 1.0, 1000.0);
-                    arcball_camera.update_screen(w as f32, h as f32);
+                        cgmath::perspective(cgmath::Deg(65.0), w / h, 1.0, 1000.0);
+                    arcball_camera.update_screen(w, h);
                 }
                 _ => {
                     return ControlFlow::Continue;

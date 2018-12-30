@@ -1,9 +1,9 @@
 [package]
 name = "arcball"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["Will Usher <willusher.life@gmail.com>"]
 readme = "README.md"
-keywords = ["camera", "arcball", "shoemake"]
+keywords = ["camera", "arcball", "shoemake", "cgmath"]
 license = "MIT"
 exclude = [
 	".travis.yml",
@@ -16,11 +16,7 @@ repository = "https://github.com/Twinklebear/arcball"
 
 [dependencies]
 cgmath = "0.16.1"
-clippy = { version = "0.0.148", optional = true }
 
 [dev-dependencies]
-glium = "0.21.0"
-
-[features]
-unstable = ["clippy"]
+glium = "0.23.0"
 
