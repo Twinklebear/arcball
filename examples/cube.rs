@@ -97,6 +97,9 @@ fn main() {
     let mut mouse_pressed = [false, false];
     let mut prev_mouse: Option<(f32, f32)> = None;
 
+    // TODO: Seems like there's some odd delay or buffering in the event
+    // loop that gives this weird latency feel to the interaction and rendering.
+    // Should fix this
     events_loop.run_forever(|e| {
         match e {
             Event::WindowEvent { event, .. } => match event {
@@ -125,7 +128,7 @@ fn main() {
                             );
                         } else if mouse_pressed[1] {
                             let mouse_delta =
-                                Vector2::new((x - prev.0), -(y - prev.1));
+                                Vector2::new(x - prev.0, -(y - prev.1));
                             arcball_camera.pan(mouse_delta, 0.16);
                         }
                         prev_mouse = Some((x, y));
