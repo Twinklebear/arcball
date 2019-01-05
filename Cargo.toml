@@ -1,6 +1,6 @@
 [package]
 name = "arcball"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["Will Usher <willusher.life@gmail.com>"]
 readme = "README.md"
 keywords = ["camera", "arcball", "shoemake", "cgmath"]
