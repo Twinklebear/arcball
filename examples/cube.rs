@@ -5,9 +5,9 @@ extern crate cgmath;
 
 use glium::Surface;
 use glium::index::PrimitiveType;
-use glium::glutin::{self, ControlFlow, ElementState, Event, MouseButton, MouseScrollDelta,
+use glium::glutin::{self, ElementState, Event, MouseButton, MouseScrollDelta,
                     VirtualKeyCode, WindowEvent};
-use cgmath::{Point3, Vector3, Vector2, Matrix4};
+use cgmath::{Vector3, Vector2};
 use arcball::ArcballCamera;
 
 #[derive(Copy, Clone)]
@@ -84,55 +84,42 @@ fn main() {
     ).unwrap();
 
     let display_dims = display.get_framebuffer_dimensions();
-    let mut persp_proj = cgmath::perspective(cgmath::Deg(65.0), display_dims.0 as f32 / display_dims.1 as f32,
-                                             1.0, 200.0);
-    let mut arcball_camera = {
-        let look_at = Matrix4::<f32>::look_at(Point3::new(0.0, 0.0, 6.0),
-                                              Point3::new(0.0, 0.0, 0.0),
-                                              Vector3::new(0.0, 1.0, 0.0));
-        ArcballCamera::new(&look_at, 0.05, 4.0, [display_dims.0 as f32, display_dims.1 as f32])
-    };
+    let persp_proj = cgmath::perspective(cgmath::Deg(65.0), display_dims.0 as f32 / display_dims.1 as f32,
+                                        1.0, 200.0);
+    let mut arcball_camera = ArcballCamera::new(Vector3::new(0.0, 0.0, 0.0), 1.0,
+                                                [display_dims.0 as f32, display_dims.1 as f32]);
 
     // Track if left/right mouse is down
     let mut mouse_pressed = [false, false];
-    let mut prev_mouse: Option<(f32, f32)> = None;
+    let mut prev_mouse: Option<(f64, f64)> = None;
 
-    // TODO: Seems like there's some odd delay or buffering in the event
-    // loop that gives this weird latency feel to the interaction and rendering.
-    // Should fix this
-    events_loop.run_forever(|e| {
-        match e {
+    loop {
+        let mut should_quit = false;
+        events_loop.poll_events(|e| match e {
             Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CloseRequested => return ControlFlow::Break,
-                WindowEvent::KeyboardInput { input, .. } => {
-                    let code = input.virtual_keycode;
-                    let pressed = input.state == ElementState::Pressed;
-                    match code {
-                        Some(VirtualKeyCode::Escape) if pressed => return ControlFlow::Break,
-                        _ => {}
-                    }
+                WindowEvent::Closed => should_quit = true,
+                WindowEvent::KeyboardInput { input, .. } => match input.virtual_keycode {
+                    Some(VirtualKeyCode::Escape) => should_quit = true,
+                    _ => {}
+                },
+                WindowEvent::CursorMoved { position, .. } if prev_mouse.is_none() => {
+                    prev_mouse = Some(position);
                 }
-
                 WindowEvent::CursorMoved { position, .. } => {
-                    let x = position.x as f32;
-                    let y = position.y as f32;
-
-                    if prev_mouse.is_none() {
-                        prev_mouse = Some((x, y));
-                    } else {
-                        let prev = prev_mouse.unwrap();
-                        if mouse_pressed[0] {
-                            arcball_camera.rotate(
-                                Vector2::new(prev.0, prev.1),
-                                Vector2::new(x, y),
-                            );
-                        } else if mouse_pressed[1] {
-                            let mouse_delta =
-                                Vector2::new(x - prev.0, -(y - prev.1));
-                            arcball_camera.pan(mouse_delta, 0.16);
-                        }
-                        prev_mouse = Some((x, y));
+                    let prev = prev_mouse.unwrap();
+                    if mouse_pressed[0] {
+                        arcball_camera.rotate(
+                            Vector2::new(prev.0 as f32, prev.1 as f32),
+                            Vector2::new(position.0 as f32, position.1 as f32)
+                        );
+                    } else if mouse_pressed[1] {
+                        let mouse_delta = Vector2::new(
+                            (position.0 - prev.0) as f32,
+                            (position.1 - prev.1) as f32
+                        );
+                        arcball_camera.pan(mouse_delta, 0.16);
                     }
+                    prev_mouse = Some(position);
                 }
                 WindowEvent::MouseInput { state, button, .. } => {
                     if button == MouseButton::Left {
@@ -144,24 +131,16 @@ fn main() {
                 WindowEvent::MouseWheel { delta, .. } => {
                     let y = match delta {
                         MouseScrollDelta::LineDelta(_, y) => y,
-                        MouseScrollDelta::PixelDelta(p) => p.y as f32,
+                        MouseScrollDelta::PixelDelta(_, y) => y,
                     };
                     arcball_camera.zoom(y, 0.16);
                 }
-                WindowEvent::Resized(size) => {
-                    let w = size.width as f32;
-                    let h = size.height as f32;
-                    persp_proj =
-                        cgmath::perspective(cgmath::Deg(65.0), w / h, 1.0, 1000.0);
-                    arcball_camera.update_screen(w, h);
-                }
-                _ => {
-                    return ControlFlow::Continue;
-                }
+                _ => {}
             },
-            _ => {
-                return ControlFlow::Continue;
-            }
+            _ => {}
+        });
+        if should_quit {
+            return;
         }
 
         let proj_view: [[f32; 4]; 4] = (persp_proj * arcball_camera.get_mat4()).into();
@@ -182,9 +161,7 @@ fn main() {
         target.clear_depth(1.0);
         target.draw(&vertex_buffer, &index_buffer, &program, &uniforms, &draw_params).unwrap();
         target.finish().unwrap();
-
-        return ControlFlow::Continue;
-    });
+    }
 }
 
 
