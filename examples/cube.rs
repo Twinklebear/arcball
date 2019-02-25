@@ -91,7 +91,7 @@ fn main() {
 
     // Track if left/right mouse is down
     let mut mouse_pressed = [false, false];
-    let mut prev_mouse: Option<(f64, f64)> = None;
+    let mut prev_mouse = None;
 
     loop {
         let mut should_quit = false;
