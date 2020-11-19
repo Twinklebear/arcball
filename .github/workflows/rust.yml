@@ -14,6 +14,8 @@ jobs:
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
+      - name: Build examples
+        run: cargo build --examples
     build_windows:
       runs-on: windows-latest
       steps:
@@ -22,6 +24,8 @@ jobs:
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose      
+      - name: Build examples
+        run: cargo build --examples
     build_macos:
       runs-on: macos-latest
       steps:
@@ -30,3 +34,5 @@ jobs:
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
+      - name: Build examples
+        run: cargo build --examples

@@ -76,7 +76,7 @@ impl<F: BaseFloat> ArcballCamera<F> {
         self.update_camera();
     }
     /// Pan the camera following the motion of the mouse. The mouse delta should be in pixels.
-    pub fn pan(&mut self, mouse_delta: Vector2<F>, elapsed: F) {
+    pub fn pan(&mut self, mouse_delta: Vector2<F>) {
         let zoom_dist = self.translation[3][3].abs();
         let delta = Vector4::new(mouse_delta.x * self.inv_screen[0],
 		                 -mouse_delta.y * self.inv_screen[1],
