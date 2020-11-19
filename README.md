@@ -5,9 +5,9 @@ for Rust applications. See
 the [cube example](examples/cube.rs) for an example of use with [glium](https://crates.io/crates/glium).
 
 [![Crates.io](https://img.shields.io/crates/v/arcball.svg)](https://crates.io/crates/arcball)
-[![Build Status](https://travis-ci.org/Twinklebear/arcball.svg?branch=master)](https://travis-ci.org/Twinklebear/arcball)
+![Build Status](https://github.com/Twinklebear/arcball/workflows/CI/badge.svg)
 
 ## Documentation
 
-Documentation can be found [here](http://www.willusher.io/arcball/arcball/).
+Documentation can be found [here](https://docs.rs/arcball/)
 

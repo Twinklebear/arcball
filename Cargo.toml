@@ -6,11 +6,10 @@ readme = "README.md"
 keywords = ["camera", "arcball", "shoemake", "cgmath"]
 license = "MIT"
 exclude = [
-	".travis.yml",
 	".gitignore",
 ]
 description = "An implementation of the Shoemake Arcball camera"
-documentation = "http://www.willusher.io/arcball/arcball/"
+documentation = "https://docs.rs/arcball/"
 homepage = "https://github.com/Twinklebear/arcball"
 repository = "https://github.com/Twinklebear/arcball"
 
