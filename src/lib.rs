@@ -27,8 +27,8 @@ impl<F: BaseFloat> ArcballCamera<F> {
             translation: Matrix4::from_translation(Vector3::new(F::zero(), F::zero(), -F::one())),
             center_translation: Matrix4::from_translation(center).invert().unwrap(),
             rotation: Quaternion::new(F::one(), F::zero(), F::zero(), F::zero()),
-            camera: Transform::one(),
-            inv_camera: Transform::one(),
+            camera: Matrix4::one(),
+            inv_camera: Matrix4::one(),
             zoom_speed,
             inv_screen: [F::one() / screen[0], F::one() / screen[1]],
         };
